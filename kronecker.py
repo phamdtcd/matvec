@@ -2,6 +2,7 @@
 import numpy as np
 import unittest
 
+# Permutation operator
 def permute(mat, A_dim1, A_dim2, B_dim1, B_dim2):
     ans = np.zeros((A_dim1 * A_dim2, B_dim1 * B_dim2))
     for j in range(A_dim2):
@@ -10,17 +11,16 @@ def permute(mat, A_dim1, A_dim2, B_dim1, B_dim2):
                                          j * B_dim2 : (j + 1) * B_dim2].reshape(B_dim1 * B_dim2, order = 'F')
     return ans
 
-def approx_kron(A, A_dim1, A_dim2, B_dim1, B_dim2):
+# Kronecker product decomposition that minimizes the Frobenius norm
+def kron_decompose(A, A_dim1, A_dim2, B_dim1, B_dim2):
     X = permute(A, A_dim1, A_dim2, B_dim1, B_dim2)
     u, s, v = np.linalg.svd(X, full_matrices = False)
     C = np.sqrt(s[0]) * u[:, 0].reshape(A_dim1, A_dim2, order = 'F')
     D = np.sqrt(s[0]) * v[0, :].reshape(B_dim1, B_dim2, order = 'F')
     return C, D
 
-# A function that receives a matrix A as the only input, get the dimension of A, 
-# iterate through all combinations of a,b,c,d such as A.shape[0] = a * c, A.shape[1] = b * d,
-# and get the approximation_kron(A, a, b, c, d) with the smallest objective value.
-def kron(A):
+# Function that finds the best Kronecker product decomposition
+def kron_aprox(A):
     A_dim1, A_dim2 = A.shape
     min_obj = np.inf
     for a in range(1, A_dim1 + 1):
@@ -29,7 +29,7 @@ def kron(A):
             for b in range(1, A_dim2 + 1):
                 if A_dim2 % b == 0:
                     d = A_dim2 // b
-                    C, D = approx_kron(A, a, b, c, d)
+                    C, D = kron_decompose(A, a, b, c, d)
                     obj = np.linalg.norm(A - np.kron(C, D), 'fro')
                     if obj < min_obj:
                         min_obj = obj
@@ -40,8 +40,8 @@ def kron(A):
 # Write unit tests for kron function
 class TestKron(unittest.TestCase):
     def test_kron(self):
-        A = np.random.rand(6, 8)
-        C, D = kron(A)
+        A = np.random.rand(256, 512)
+        C, D = kron_aprox(A)
         self.assertTrue(np.allclose(A, np.kron(C, D)))
 
 # Run the tests
