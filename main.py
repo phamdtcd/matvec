@@ -1,6 +1,6 @@
 from cmb.matrix import load_matrix, load_diagonal_matrix
 from cmb.matrix import generate_matrix_D, generate_matrix_Q
-from kronecker import kron_aprox
+from procedures.kronecker import kron_aprox
 if __name__ == '__main__':
     # Load matrix A from the file a.csv in data/cmb folder
     A = load_matrix("data/cmb/a.csv")

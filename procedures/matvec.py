@@ -1,6 +1,6 @@
 # Files containing functions for matrix-vector multiplication
 import numpy as np
-import kronecker
+import procedures.kronecker as kronecker
 import unittest
 
 # Direct multiplication using numpy
