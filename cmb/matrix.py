@@ -2,7 +2,8 @@ import sys
 import os
 
 import numpy as np
-from cmb.utils import calculate_matrix_A, find_neighbors, calc_D_size, calculate_N_from_level
+from utils import *
+import unittest
 
 # Load normal matrix from file
 def load_matrix(aFile):
@@ -85,4 +86,32 @@ def generate_matrix_Y_hat(y, N, m, T, A):
     Y = np.reshape(y,(N, m), order='F')
 
     return Y.dot(T.dot(A))
-    
+
+# Algorithm 1: Matvec procedure v -> Dv
+def matvec_D(D, v):
+    row_sums = D.sum(axis=1)
+    N = D.shape[0]
+    lvl = calculate_level_from_N(N)
+    (m,n) = calc_D_size(lvl)
+    res = np.zeros((N,), dtype=int)
+    for j in range(N):
+        j_neighbors = find_neighbors(j, m, n)
+        j_row_sum = row_sums[j] - D[j,j]
+        res[j] = sum([v[i] for i in j_neighbors]) - j_row_sum * v[j]
+    return res
+
+# Write unittest for matvec_D with level = 2
+class TestMatvecD(unittest.TestCase):
+    def test_matvec_D(self):
+        lvl = 3
+        N = calculate_N_from_level(lvl)
+        (m,n) = calc_D_size(lvl)
+        D = generate_matrix_D(lvl)
+        v = np.random.randint(10, size=(N,))
+        res = matvec_D(D, v)
+        res2 = D.dot(v)
+        self.assertTrue(np.array_equal(res, res2))
+
+# Run the test
+if __name__ == '__main__':
+    unittest.main()

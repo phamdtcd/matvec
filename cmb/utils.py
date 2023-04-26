@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 import math
+import unittest
 
 V_PLANCK = [x * (10**9) for x in [30.0, 44.0, 70.0, 100.0, 143.0, 217.0, 353.0, 545.0, 857.0]]
 V_0 = V_PLANCK[3]
@@ -93,7 +94,7 @@ def find_neighbors(i, m, n):
         res.pop(L)
     elif i + m > n * m - 1: # The last column
         res.pop(R)
-    return res.values()
+    return list(res.values())
 
 def calc_D_size(v):
     base = 2**v
@@ -102,3 +103,6 @@ def calc_D_size(v):
 def calculate_N_from_level(lvl):
     # N = 12 * N_side ^ 2 = 12 * (2*lvl)^2
     return (4**lvl) * 12
+
+def calculate_level_from_N(N):
+    return int(math.log(N/12, 4))
