@@ -2,7 +2,7 @@ import sys
 import os
 
 import numpy as np
-from utils import *
+from cmb.utils import *
 import unittest
 
 # Load normal matrix from file
@@ -100,6 +100,15 @@ def matvec_D(D, v):
         res[j] = sum([v[i] for i in j_neighbors]) - j_row_sum * v[j]
     return res
 
+# Algorithm 2: Matvec procedure v -> Qv using reshape
+def matvec_Q(Q1, Q2, v):
+    n = Q1.shape[0]
+    N = Q2.shape[0]
+    V = np.reshape(v, (N, n), order='F')
+    V = Q2.dot(V).dot(Q1)
+    return np.reshape(V, (-1,), order='F')
+
+
 # Write unittest for matvec_D with level = 2
 class TestMatvecD(unittest.TestCase):
     def test_matvec_D(self):
@@ -111,7 +120,7 @@ class TestMatvecD(unittest.TestCase):
         res = matvec_D(D, v)
         res2 = D.dot(v)
         self.assertTrue(np.array_equal(res, res2))
-
+        
 # Run the test
 if __name__ == '__main__':
     unittest.main()
